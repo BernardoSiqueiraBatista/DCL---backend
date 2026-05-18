@@ -1,0 +1,813 @@
+<!-- Esse arquivo serve apenas para testar visualmente (pode usar o insomnia para a mesma função) as rotas da feature de Autenticação -->
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DCL Auth Tester</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0c;
+      --card: #16161d;
+      --primary: #6c47ff;
+      --ph: #5a39d6;
+      --ok: #10b981;
+      --err: #ef4444;
+      --warn: #f59e0b;
+      --text: #e2e8f0;
+      --dim: #94a3b8;
+      --border: #2d2d3d
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 16px;
+      line-height: 1.5
+    }
+
+    .wrap {
+      max-width: 1300px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px
+    }
+
+    .full {
+      grid-column: 1/-1
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary), #a855f7);
+      padding: 24px;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(108, 71, 255, .25)
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px
+    }
+
+    .bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+      align-items: center
+    }
+
+    .badge {
+      background: rgba(0, 0, 0, .35);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      border: 1px solid rgba(255, 255, 255, .1)
+    }
+
+    .badge b {
+      color: var(--ok)
+    }
+
+    .ping-btn {
+      background: rgba(255, 255, 255, .12);
+      border: none;
+      color: #fff;
+      padding: 5px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600
+    }
+
+    .ping-btn:hover {
+      background: rgba(255, 255, 255, .2)
+    }
+
+    /* tabs */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 14px;
+      flex-wrap: wrap
+    }
+
+    .tab {
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--dim);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: .15s
+    }
+
+    .tab.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary)
+    }
+
+    .tab-panel {
+      display: none
+    }
+
+    .tab-panel.active {
+      display: block
+    }
+
+    section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 20px;
+      border-radius: 14px;
+      transition: .2s
+    }
+
+    section:focus-within {
+      border-color: var(--primary)
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    h2::before {
+      content: '';
+      width: 4px;
+      height: 16px;
+      background: var(--primary);
+      border-radius: 2px
+    }
+
+    .tag {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: #1e1e2e;
+      color: var(--dim);
+      border: 1px solid var(--border)
+    }
+
+    .tag.post {
+      color: #60a5fa;
+      border-color: #60a5fa33
+    }
+
+    .row {
+      margin-bottom: 12px
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--dim);
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: .5px
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      background: #0f0f15;
+      border: 1px solid var(--border);
+      color: #fff;
+      border-radius: 8px;
+      font-size: 13px;
+      transition: .2s
+    }
+
+    input:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(108, 71, 255, .12)
+    }
+
+    input.auto {
+      border-color: #2a2a4a;
+      color: var(--dim)
+    }
+
+    button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 11px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: .2s
+    }
+
+    button:hover {
+      background: var(--ph);
+      transform: scale(1.01)
+    }
+
+    button:active {
+      transform: scale(.98)
+    }
+
+    button:disabled {
+      opacity: .5;
+      cursor: not-allowed
+    }
+
+    .btn-ok {
+      background: #059669
+    }
+
+    .btn-ok:hover {
+      background: #047857
+    }
+
+    .btn-warn {
+      background: #d97706
+    }
+
+    .btn-warn:hover {
+      background: #b45309
+    }
+
+    .btn-err {
+      background: #dc2626
+    }
+
+    .btn-err:hover {
+      background: #b91c1c
+    }
+
+    .btn-sec {
+      background: #2d2d3d;
+      margin-top: 8px;
+      font-size: 12px
+    }
+
+    .btn-sec:hover {
+      background: #3d3d4d
+    }
+
+    .note {
+      font-size: 11px;
+      color: var(--dim);
+      margin-top: 6px;
+      padding: 6px 10px;
+      background: #0f0f1a;
+      border-radius: 6px;
+      border-left: 3px solid var(--primary)
+    }
+
+    /* console */
+    #console-wrap {
+      background: #000;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column
+    }
+
+    .con-hdr {
+      background: #111;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--dim)
+    }
+
+    .con-hdr span {
+      font-family: 'Fira Code', monospace
+    }
+
+    .con-actions {
+      display: flex;
+      gap: 6px
+    }
+
+    .con-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--dim);
+      padding: 2px 10px;
+      font-size: 10px;
+      width: auto;
+      border-radius: 4px
+    }
+
+    .con-btn:hover {
+      background: #1a1a1a;
+      transform: none
+    }
+
+    #output {
+      padding: 16px;
+      height: 400px;
+      overflow-y: auto;
+      font-family: 'Fira Code', monospace;
+      font-size: 12px;
+      margin: 0;
+      scroll-behavior: smooth
+    }
+
+    .entry {
+      margin-bottom: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #111;
+      animation: fi .25s ease-out
+    }
+
+    .meta {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 6px
+    }
+
+    .t {
+      color: var(--dim);
+      font-size: 11px
+    }
+
+    .ep {
+      color: var(--primary);
+      font-weight: 700
+    }
+
+    .ok-tag {
+      color: var(--ok);
+      font-size: 11px;
+      font-weight: 700
+    }
+
+    .err-tag {
+      color: var(--err);
+      font-size: 11px;
+      font-weight: 700
+    }
+
+    .http-tag {
+      font-size: 10px;
+      padding: 1px 7px;
+      border-radius: 10px;
+      background: #1e1e2e;
+      color: var(--dim)
+    }
+
+    pre {
+      margin: 0;
+      background: #080808;
+      padding: 10px;
+      border-radius: 6px;
+      overflow-x: auto;
+      color: #cbd5e1;
+      font-size: 11px;
+      white-space: pre-wrap;
+      word-break: break-all
+    }
+
+    @keyframes fi {
+      from {
+        opacity: 0;
+        transform: translateY(8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .spin {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255, 255, 255, .3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: sp .7s linear infinite;
+      display: none
+    }
+
+    @keyframes sp {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .loading .spin {
+      display: block
+    }
+
+    .loading .lbl {
+      display: none
+    }
+
+    @media(max-width:800px) {
+      .wrap {
+        grid-template-columns: 1fr
+      }
+
+      .full {
+        grid-column: 1
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <!-- HEADER -->
+    <header class="full">
+      <h1>🔐 DCL Backend — Auth Tester</h1>
+      <div class="bar">
+        <div class="badge">API: <b id="api-status">Verificando…</b></div>
+        <div class="badge">User ID: <b id="st-uid">—</b></div>
+        <div class="badge">Sessão: <b id="st-sess">Inativa</b></div>
+        <div class="badge">Role: <b id="st-role">—</b></div>
+        <button class="ping-btn" onclick="checkHealth()">⚡ Ping API</button>
+      </div>
+    </header>
+
+    <!-- ── COLUNA 1 ── -->
+
+    <!-- 1. REGISTER -->
+    <section>
+      <h2>Cadastro <span class="tag post">POST /auth/register</span></h2>
+      <form onsubmit="send(event,'/auth/register',this,onRegister)">
+        <div class="row"><label>Nome</label><input name="name" value="Marcos Dev"></div>
+        <div class="row"><label>E-mail</label><input name="email" id="r-email" value="marcos@dclab.com"></div>
+        <div class="row"><label>Senha <small>(≥8, 1 maiúsc, 1 número)</small></label><input name="password"
+            type="password" value="Senha123!"></div>
+        <button type="submit">
+          <div class="spin"></div><span class="lbl">Registrar</span>
+        </button>
+      </form>
+      <div class="note">→ Retorna <code>userId</code> e dispara e-mail com OTP de verificação.</div>
+    </section>
+
+    <!-- 2. VERIFY OTP -->
+    <section>
+      <h2>Verificar E-mail <span class="tag post">POST /auth/verify-otp</span></h2>
+      <form onsubmit="send(event,'/auth/verify-otp',this)">
+        <div class="row"><label>User ID <small>(auto)</small></label><input name="userId" id="f-uid" class="auto"
+            placeholder="preenchido após registro/login"></div>
+        <div class="row"><label>Código OTP (6 dígitos)</label><input name="otp" id="f-otp" placeholder="123456"
+            maxlength="6" inputmode="numeric"></div>
+        <button type="submit" class="btn-ok">
+          <div class="spin"></div><span class="lbl">✔ Validar OTP</span>
+        </button>
+      </form>
+      <button class="btn-sec" onclick="resendOtp(this)">
+        <div class="spin"></div><span class="lbl">↺ Reenviar OTP</span>
+      </button>
+      <div class="note">→ Cole o código recebido no Gmail (ou veja no terminal do servidor em modo dev).</div>
+    </section>
+
+    <!-- 3. LOGIN -->
+    <section>
+      <h2>Login <span class="tag post">POST /auth/login</span></h2>
+      <form onsubmit="send(event,'/auth/login',this,onLogin)">
+        <div class="row"><label>E-mail</label><input name="email" id="l-email" value="marcos@dclab.com"></div>
+        <div class="row"><label>Senha</label><input name="password" type="password" value="Senha123!"></div>
+        <button type="submit">
+          <div class="spin"></div><span class="lbl">Entrar</span>
+        </button>
+      </form>
+      <div class="note">→ Retorna <code>accessToken</code> + <code>refreshToken</code>. Tokens salvos automaticamente.
+      </div>
+    </section>
+
+    <!-- 4. REFRESH -->
+    <section>
+      <h2>Renovar Token <span class="tag post">POST /auth/refresh-token</span></h2>
+      <div class="row"><label>Refresh Token (auto)</label><input id="f-rt" class="auto"
+          placeholder="preenchido após login" readonly></div>
+      <button onclick="doRefresh(this)">
+        <div class="spin"></div><span class="lbl">↻ Renovar Access Token</span>
+      </button>
+      <div class="note">→ Rotaciona o par de tokens. O token antigo é invalidado.</div>
+    </section>
+
+    <!-- ── COLUNA 2 ── -->
+
+    <!-- 5. FORGOT PASSWORD -->
+    <section>
+      <h2>Esqueci a Senha <span class="tag post">POST /auth/forgot-password</span></h2>
+      <form onsubmit="send(event,'/auth/forgot-password',this)">
+        <div class="row"><label>E-mail</label><input name="email" id="fp-email" value="marcos@dclab.com"></div>
+        <button type="submit" class="btn-warn">
+          <div class="spin"></div><span class="lbl">Enviar Código de Reset</span>
+        </button>
+      </form>
+      <div class="note">→ Resposta genérica (anti-enumeração). OTP de reset vai para o e-mail.</div>
+    </section>
+
+    <!-- 6. RESET PASSWORD -->
+    <section>
+      <h2>Redefinir Senha <span class="tag post">POST /auth/reset-password</span></h2>
+      <form onsubmit="send(event,'/auth/reset-password',this)">
+        <div class="row"><label>E-mail (mesmo do forgot-password)</label><input name="email" id="rp-email"
+            value="marcos@dclab.com"></div>
+        <div class="row"><label>OTP de Reset</label><input name="otp" placeholder="123456" maxlength="6"
+            inputmode="numeric"></div>
+        <div class="row"><label>Nova Senha</label><input name="newPassword" type="password" placeholder="NovaSenha1">
+        </div>
+        <button type="submit" class="btn-warn">
+          <div class="spin"></div><span class="lbl">Redefinir Senha</span>
+        </button>
+      </form>
+      <div class="note">→ Usa <code>email</code> (não userId). Revoga todos os refresh tokens após reset.</div>
+    </section>
+
+    <!-- 7. LOGOUT -->
+    <section>
+      <h2>Logout <span class="tag post">POST /auth/logout</span></h2>
+      <div class="row"><label>Refresh Token a revogar (auto)</label><input id="f-rt2" class="auto"
+          placeholder="preenchido após login" readonly></div>
+      <div class="row"><label>Access Token (auto — enviado no header)</label><input id="f-at-disp" class="auto"
+          placeholder="preenchido após login" readonly></div>
+      <button onclick="doLogout(this)" class="btn-err">
+        <div class="spin"></div><span class="lbl">Sair da Conta</span>
+      </button>
+      <div class="note">→ Revoga o refresh token no banco. Operação idempotente.</div>
+    </section>
+
+    <!-- 8. CLEAR SESSION -->
+    <section>
+      <h2>Estado Local</h2>
+      <div style="display:grid;gap:8px">
+        <button onclick="copyToken('at')" class="btn-sec">
+          <div class="spin"></div><span class="lbl">📋 Copiar Access Token</span>
+        </button>
+        <button onclick="copyToken('rt')" class="btn-sec">
+          <div class="spin"></div><span class="lbl">📋 Copiar Refresh Token</span>
+        </button>
+        <button onclick="clearSession()" class="btn-err">
+          <div class="spin"></div><span class="lbl">🗑 Limpar Estado Local</span>
+        </button>
+      </div>
+      <div class="note" style="margin-top:10px">Tokens e User ID são persistidos no localStorage entre recarregamentos.
+      </div>
+    </section>
+
+    <!-- CONSOLE -->
+    <div id="console-wrap" class="full">
+      <div class="con-hdr">
+        <span>▶ TERMINAL DE RESPOSTAS</span>
+        <div class="con-actions">
+          <button class="con-btn"
+            onclick="document.getElementById('output').innerHTML='<span style=color:#444>Console limpo.</span>'">LIMPAR</button>
+          <button class="con-btn" onclick="togglePin()">📌 PIN SCROLL</button>
+        </div>
+      </div>
+      <div id="output"><span style="color:#444">Aguardando requisições…</span></div>
+    </div>
+
+  </div>
+
+  <script>
+    const API = 'http://localhost:3000';
+    let at = localStorage.getItem('at') || '';
+    let rt = localStorage.getItem('rt') || '';
+    let uid = localStorage.getItem('uid') || '';
+    let userRole = localStorage.getItem('role') || '';
+    let pinScroll = false;
+
+    // ── boot ──────────────────────────────────────────────────────────────────────
+    window.onload = () => { syncUI(); checkHealth(); };
+
+    // ── UI sync ───────────────────────────────────────────────────────────────────
+    function syncUI() {
+      document.getElementById('st-uid').innerText = uid ? uid.slice(0, 8) + '…' : '—';
+      document.getElementById('st-sess').innerText = at ? 'Ativa ✔' : 'Inativa';
+      document.getElementById('st-sess').style.color = at ? 'var(--ok)' : 'var(--dim)';
+      document.getElementById('st-role').innerText = userRole || '—';
+      if (uid) {
+        document.getElementById('f-uid').value = uid;
+      }
+      if (rt) {
+        document.getElementById('f-rt').value = rt.slice(0, 40) + '…';
+        document.getElementById('f-rt2').value = rt.slice(0, 40) + '…';
+      }
+      if (at) {
+        document.getElementById('f-at-disp').value = at.slice(0, 40) + '…';
+      }
+    }
+
+    // ── log ───────────────────────────────────────────────────────────────────────
+    function log(endpoint, result, httpCode, ms) {
+      const out = document.getElementById('output');
+      const entry = document.createElement('div');
+      entry.className = 'entry';
+
+      const ok = result.success;
+      const time = new Date().toLocaleTimeString('pt-BR');
+      const codeColor = httpCode >= 400 ? 'var(--err)' : httpCode >= 200 ? 'var(--ok)' : 'var(--dim)';
+
+      entry.innerHTML = `
+    <div class="meta">
+      <span class="t">${time}</span>
+      <span class="ep">POST ${endpoint}</span>
+      <span style="color:${codeColor};font-size:11px;font-weight:700">HTTP ${httpCode ?? '—'}</span>
+      ${ms != null ? `<span class="http-tag">${ms}ms</span>` : ''}
+      <span class="${ok ? 'ok-tag' : 'err-tag'}">${ok ? '✔ SUCESSO' : '✖ ERRO'}</span>
+    </div>
+    <pre>${JSON.stringify(result, null, 2)}</pre>`;
+
+      out.prepend(entry);
+      if (!pinScroll) out.scrollTop = 0;
+    }
+
+    function logInfo(msg) {
+      const out = document.getElementById('output');
+      const el = document.createElement('div');
+      el.className = 'entry';
+      el.innerHTML = `<div class="meta"><span class="t">${new Date().toLocaleTimeString('pt-BR')}</span><span style="color:var(--dim);font-size:12px">${msg}</span></div>`;
+      out.prepend(el);
+    }
+
+    // ── generic fetch ─────────────────────────────────────────────────────────────
+    async function api(path, body, useAuth = false) {
+      const headers = { 'Content-Type': 'application/json' };
+      if (useAuth && at) headers['Authorization'] = `Bearer ${at}`;
+      const t0 = Date.now();
+      const res = await fetch(`${API}${path}`, { method: 'POST', headers, body: JSON.stringify(body) });
+      const data = await res.json();
+      return { data, status: res.status, ms: Date.now() - t0 };
+    }
+
+    // ── form helper ───────────────────────────────────────────────────────────────
+    async function send(event, path, form, callback) {
+      event.preventDefault();
+      const btn = form.querySelector('button[type="submit"]');
+      const body = Object.fromEntries(new FormData(form).entries());
+      setLoading(btn, true);
+      try {
+        const { data, status, ms } = await api(path, body);
+        log(path, data, status, ms);
+        if (data.success && callback) callback(data);
+        syncUI();
+      } catch (e) {
+        log(path, { success: false, message: e.message }, null, null);
+      } finally {
+        setLoading(btn, false);
+      }
+    }
+
+    // ── callbacks ─────────────────────────────────────────────────────────────────
+    function onRegister(data) {
+      if (data.data?.userId) {
+        uid = data.data.userId;
+        localStorage.setItem('uid', uid);
+        // auto-fill linked fields
+        document.getElementById('f-uid').value = uid;
+        document.getElementById('l-email').value = document.getElementById('r-email').value;
+        document.getElementById('fp-email').value = document.getElementById('r-email').value;
+        document.getElementById('rp-email').value = document.getElementById('r-email').value;
+        logInfo(`💾 userId salvo: ${uid.slice(0, 8)}… — Cole o OTP do Gmail na seção "Verificar E-mail".`);
+      }
+    }
+
+    function onLogin(data) {
+      if (data.data?.accessToken) {
+        at = data.data.accessToken;
+        rt = data.data.refreshToken;
+        uid = data.data.user?.id || uid;
+        userRole = data.data.user?.role || '';
+        localStorage.setItem('at', at);
+        localStorage.setItem('rt', rt);
+        localStorage.setItem('uid', uid);
+        localStorage.setItem('role', userRole);
+        logInfo(`🔑 Tokens salvos. Role: ${userRole}`);
+      }
+      // handle unverified account
+      if (!data.success && data.errors?.requiresVerification) {
+        uid = data.errors.userId || uid;
+        localStorage.setItem('uid', uid);
+        document.getElementById('f-uid').value = uid;
+        logInfo(`⚠ Conta não verificada — userId atualizado. Verifique o e-mail.`);
+      }
+    }
+
+    // ── session actions ───────────────────────────────────────────────────────────
+    async function doRefresh(btn) {
+      if (!rt) return logInfo('⚠ Sem refresh token. Faça login primeiro.');
+      setLoading(btn, true);
+      try {
+        const { data, status, ms } = await api('/auth/refresh-token', { refreshToken: rt });
+        log('/auth/refresh-token', data, status, ms);
+        if (data.success) {
+          at = data.data.accessToken;
+          rt = data.data.refreshToken;
+          localStorage.setItem('at', at);
+          localStorage.setItem('rt', rt);
+          logInfo('♻ Tokens rotacionados com sucesso.');
+          syncUI();
+        }
+      } catch (e) {
+        log('/auth/refresh-token', { success: false, message: e.message });
+      } finally { setLoading(btn, false); }
+    }
+
+    async function doLogout(btn) {
+      if (!rt || !at) return logInfo('⚠ Sem sessão ativa para encerrar.');
+      setLoading(btn, true);
+      try {
+        const { data, status, ms } = await api('/auth/logout', { refreshToken: rt }, true);
+        log('/auth/logout', data, status, ms);
+        if (data.success) {
+          at = ''; rt = ''; userRole = '';
+          localStorage.removeItem('at');
+          localStorage.removeItem('rt');
+          localStorage.removeItem('role');
+          logInfo('👋 Sessão encerrada. Access token pode ainda ser válido até expirar (15min).');
+          syncUI();
+        }
+      } catch (e) {
+        log('/auth/logout', { success: false, message: e.message });
+      } finally { setLoading(btn, false); }
+    }
+
+    async function resendOtp(btn) {
+      if (!uid) return logInfo('⚠ Sem userId. Faça o cadastro primeiro.');
+      setLoading(btn, true);
+      try {
+        const { data, status, ms } = await api('/auth/resend-otp', { userId: uid });
+        log('/auth/resend-otp', data, status, ms);
+      } catch (e) {
+        log('/auth/resend-otp', { success: false, message: e.message });
+      } finally { setLoading(btn, false); }
+    }
+
+    // ── helpers ───────────────────────────────────────────────────────────────────
+    function clearSession() {
+      at = ''; rt = ''; uid = ''; userRole = '';
+      localStorage.clear();
+      syncUI();
+      logInfo('🗑 Estado local limpo.');
+    }
+
+    async function checkHealth() {
+      const badge = document.getElementById('api-status');
+      try {
+        const t0 = Date.now();
+        const res = await fetch(`${API}/health`);
+        const d = await res.json();
+        badge.innerText = `ONLINE (${Date.now() - t0}ms)`;
+        badge.style.color = 'var(--ok)';
+      } catch {
+        badge.innerText = 'OFFLINE';
+        badge.style.color = 'var(--err)';
+      }
+    }
+
+    function copyToken(key) {
+      const val = key === 'at' ? at : rt;
+      if (!val) return logInfo('⚠ Nenhum token para copiar.');
+      navigator.clipboard.writeText(val).then(() => logInfo(`📋 ${key === 'at' ? 'Access' : 'Refresh'} token copiado.`));
+    }
+
+    function setLoading(btn, v) {
+      if (!btn) return;
+      btn.disabled = v;
+      v ? btn.classList.add('loading') : btn.classList.remove('loading');
+    }
+
+    function togglePin() {
+      pinScroll = !pinScroll;
+      logInfo(`📌 Pin scroll: ${pinScroll ? 'ATIVADO' : 'DESATIVADO'}`);
+    }
+  </script>
+</body>
+
+</html>
