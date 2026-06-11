@@ -10,13 +10,22 @@ const __dirname  = path.dirname(__filename);
 
 const { Pool } = pg;
 
-const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432', 10),
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-});
+const DATABASE_URL = process.env.DATABASE_URL || null;
+const useSsl = (process.env.DB_SSL || (DATABASE_URL ? 'true' : 'false')) === 'true';
+const ssl = useSsl ? { rejectUnauthorized: false } : false;
+
+const pool = new Pool(
+  DATABASE_URL
+    ? { connectionString: DATABASE_URL, ssl }
+    : {
+        host: process.env.DB_HOST || 'localhost',
+        port: parseInt(process.env.DB_PORT || '5432', 10),
+        database: process.env.DB_NAME,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASS,
+        ssl,
+      }
+);
 
 const MIGRATIONS_DIR = path.join(__dirname, 'migrations');
 

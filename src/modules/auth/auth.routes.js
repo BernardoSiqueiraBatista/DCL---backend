@@ -13,6 +13,7 @@ import {
 } from '../../utils/validators.js';
 import { authMiddleware } from '../../middlewares/auth.middleware.js';
 import { loginLimiter, otpLimiter, authLimiter } from '../../utils/rateLimiter.js';
+import * as usersController from '../users/users.controller.js';
 
 const router = Router();
 
@@ -27,5 +28,8 @@ router.post('/reset-password', otpLimiter,   resetPasswordRules,  validate, cont
 
 // Fix 8: logout explícito — requer access token válido
 router.post('/logout',         authMiddleware, authLimiter, logoutRules, validate, controller.logout);
+
+// Task 1 — perfil do usuário autenticado
+router.get('/me',              authMiddleware, usersController.getProfile);
 
 export default router;
